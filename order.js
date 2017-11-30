@@ -3,14 +3,17 @@
 const uuidv1 = require('uuid/v1');
 
 const AWS = require("aws-sdk");
-const DOC = require("dynamodb-doc");
-
 AWS.config.update({region: "us-west-1"});
 
-const docClient = new DOC.DynamoDB();
+var docClient = new AWS.DynamoDB.DocumentClient();
+
 exports.handler = (event, context, callback) => {
 
-    let params = {
+
+    //console.log("Event..." + JSON.stringify(event));
+
+
+    var params = {
         TableName: 'Orders'
     };
 
@@ -30,17 +33,26 @@ exports.handler = (event, context, callback) => {
 
         case 'GET':
             params.Key = {ID : event['queryStringParameters']['SKU']};
-            docClient.getItem(params, done);
+            docClient.get(params, done);
             break;
         case 'PUT':
             params.Item = event.body;
             params.Key = {ID: event.body.ID};
-            docClient.updateItem(params, done);
+            docClient.update(params, done);
             break;
         case 'POST':
             params.Item = event.body;
-            params.Item.orderid = uuidv1();
-            docClient.putItem(params, done);
+            console.log("Creating Order...." + JSON.stringify(params));
+            //params.Item.orderid = uuidv1();
+            docClient.put(params,function(err, data) {
+                if (err) {
+                    console.log(err, err.stack);
+                    done(err, data);
+                } else {
+                    console.log(data);
+                    done(err, data);
+                }
+            });
             break;
         default:
             done(new Error(`Unsupported method "${event.httpMethod}"`));
