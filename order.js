@@ -2,7 +2,6 @@
 
 const uuidv1 = require('uuid/v1');
 
-
 const AWS = require("aws-sdk");
 const DOC = require("dynamodb-doc");
 
