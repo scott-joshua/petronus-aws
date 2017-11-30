@@ -28,7 +28,7 @@ exports.handler = (event, context, callback) => {
             break;
         case 'POST':
             params.Item = event.body;
-            params.Key = params.Item.ID = {ID: uuidv1()};
+            params.Key = {ID: uuidv1()};
             docClient.putItem(params, done(err, data));
             break;
         default:
