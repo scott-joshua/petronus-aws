@@ -15,6 +15,14 @@ exports.handler = (event, context, callback) => {
         TableName: 'Orders'
     };
 
+    const done = (err, res) => callback(null, {
+        statusCode: err ? '400' : '200',
+        body: err ? err.message : JSON.stringify(res),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
 
     switch (event.httpMethod) {
         case 'GET':
@@ -37,13 +45,7 @@ exports.handler = (event, context, callback) => {
 
 
 
-    const done = (err, res) => callback(null, {
-        statusCode: err ? '400' : '200',
-        body: err ? err.message : JSON.stringify(res),
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
+
 /*
 
 
