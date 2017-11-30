@@ -18,7 +18,7 @@ exports.handler = (event, context, callback) => {
 
 
     var params = {
-        TableName: 'Orders'
+        TableName: 'Carts'
     };
 
     const done = (err, res) => callback(null, {
@@ -32,20 +32,19 @@ exports.handler = (event, context, callback) => {
 
     switch (event.httpMethod) {
 
-
         case 'GET':
-            params.Key = {OrderId: event['pathParameters']['ID']};
+            params.Key = {CartId: event['pathParameters']['ID']};
             docClient.getItem(params, done);
             break;
         case 'PUT':
             params.Item = event.body;
-            params.Key = {OrderId: event.body.OrderId};
+            params.Key = {CartId: event.body.CartId};
             docClient.updateItem(params, done);
             break;
         case 'POST':
-            var order = JSON.parse(event.body);
-            order.OrderId = uuidv1();
-            params.Item = order;
+            var cart = JSON.parse(event.body);
+            cart.CartId = uuidv1();
+            params.Item = cart;
             docClient.putItem(params, done);
             break;
         default:

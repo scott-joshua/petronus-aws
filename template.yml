@@ -58,3 +58,28 @@ Resources:
             Properties:
               Path: /order
               Method: put
+
+  CartResource:
+        Type: AWS::Serverless::Function
+        Properties:
+          Handler: cart.handler
+          Runtime: nodejs4.3
+          Role:
+            Fn::ImportValue:
+              !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+          Events:
+            GetEvent:
+              Type: Api
+              Properties:
+                Path: /cart/{ID}
+                Method: get
+            PostEvent:
+              Type: Api
+              Properties:
+                Path: /cart
+                Method: post
+            PutEvent:
+              Type: Api
+              Properties:
+                Path: /cart
+                Method: put

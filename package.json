@@ -4,7 +4,9 @@
     "version": "0.0.1",
     "private": true,
     "dependencies": {
+        "aws-serverless-express": "latest",
+        "dynamodb-doc": "^1.0.0",
         "express": "latest",
-        "aws-serverless-express": "latest"
+        "uuid": "^3.1.0"
     }
 }
