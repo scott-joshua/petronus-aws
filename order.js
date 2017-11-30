@@ -26,6 +26,9 @@ exports.handler = (event, context, callback) => {
     console.log("HTTP Method...." + event.httpMethod);
 
     switch (event.httpMethod) {
+
+
+
         case 'GET':
             params.Key = {ID : event['queryStringParameters']['SKU']};
             docClient.getItem(params, done);
@@ -37,7 +40,7 @@ exports.handler = (event, context, callback) => {
             break;
         case 'POST':
             params.Item = event.body;
-            params.Key = {ID: uuidv1()};
+            params.Item.ID =  uuidv1();
             docClient.putItem(params, done);
             break;
         default:
