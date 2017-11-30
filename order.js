@@ -32,12 +32,12 @@ exports.handler = (event, context, callback) => {
         case 'PUT':
             params.Item = event.body;
             params.Key = {ID: event.body.ID};
-            docClient.updateItem(params, done(err, data));
+            docClient.updateItem(params, done);
             break;
         case 'POST':
             params.Item = event.body;
             params.Key = {ID: uuidv1()};
-            docClient.putItem(params, done(err, data));
+            docClient.putItem(params, done);
             break;
         default:
             done(new Error(`Unsupported method "${event.httpMethod}"`));
