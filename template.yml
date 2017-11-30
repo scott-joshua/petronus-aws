@@ -6,13 +6,13 @@ Transform:
 Parameters:
   ProjectId:
     Type: String
-    Description: AWS CodeStar projectID used to associate new resources to team members
+    Description: AWS Patronus Micro Services
 
 Resources:
-  HelloWorld:
+  ProductResource:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: index.handler
+      Handler: product.handler
       Runtime: nodejs4.3
       Role:
         Fn::ImportValue:
@@ -21,10 +21,40 @@ Resources:
         GetEvent:
           Type: Api
           Properties:
-            Path: /
+            Path: /product/{SKU}
             Method: get
         PostEvent:
           Type: Api
           Properties:
-            Path: /
+            Path: /product
             Method: post
+        PutEvent:
+          Type: Api
+          Properties:
+            Path: /product
+            Method: put
+
+  OrderResource:
+      Type: AWS::Serverless::Function
+      Properties:
+        Handler: order.handler
+        Runtime: nodejs4.3
+        Role:
+          Fn::ImportValue:
+            !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+        Events:
+          GetEvent:
+            Type: Api
+            Properties:
+              Path: /order
+              Method: get
+          PostEvent:
+            Type: Api
+            Properties:
+              Path: /order
+              Method: post
+          PutEvent:
+            Type: Api
+            Properties:
+              Path: /order
+              Method: put

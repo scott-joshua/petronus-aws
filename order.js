@@ -2,23 +2,40 @@
 
 const uuidv1 = require('uuid/v1');
 
+
 const AWS = require("aws-sdk");
+const DOC = require("dynamodb-doc");
 
-const docClient = new AWS.DynamoDB.DocumentClient({region: 'us-west-2'});
+AWS.config.update({region: "us-west-1"});
 
-exports.order = (event, context, callback) => {
-
-    let order = event.body;
-    order.ID = uuidv1();
-
+const docClient = new DOC.DynamoDB();
+exports.handler = (event, context, callback) => {
 
     let params = {
-        Item: order,
         TableName: 'Orders'
     };
 
-    console.log("Adding a new Order..." + order.ID);
-    docClient.put(params, done(err, data));
+
+    switch (event.httpMethod) {
+        case 'GET':
+            params.Key = {ID : event['queryStringParameters']['SKU']};
+            docClient.getItem(params, done);
+            break;
+        case 'PUT':
+            params.Item = event.body;
+            params.Key = {ID: event.body.ID};
+            docClient.updateItem(params, done(err, data));
+            break;
+        case 'POST':
+            params.Item = event.body;
+            params.Key = params.Item.ID = {ID: uuidv1()};
+            docClient.putItem(params, done(err, data));
+            break;
+        default:
+            done(new Error(`Unsupported method "${event.httpMethod}"`));
+    }
+
+
 
     const done = (err, res) => callback(null, {
         statusCode: err ? '400' : '200',
@@ -28,22 +45,6 @@ exports.order = (event, context, callback) => {
         },
     });
 /*
-    switch (event.httpMethod) {
-        case 'DELETE':
-            dynamo.deleteItem(JSON.parse(event.body), done);
-            break;
-        case 'GET':
-            dynamo.scan({ TableName: event.queryStringParameters.TableName }, done);
-            break;
-        case 'POST':
-            dynamo.putItem(JSON.parse(event.body), done);
-            break;
-        case 'PUT':
-            dynamo.updateItem(JSON.parse(event.body), done);
-            break;
-        default:
-            done(new Error(`Unsupported method "${event.httpMethod}"`));
-    }
 
 
 
