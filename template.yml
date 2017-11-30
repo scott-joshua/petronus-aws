@@ -46,7 +46,7 @@ Resources:
           GetEvent:
             Type: Api
             Properties:
-              Path: /order
+              Path: /order/{ID}
               Method: get
           PostEvent:
             Type: Api

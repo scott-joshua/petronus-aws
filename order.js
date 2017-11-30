@@ -23,6 +23,7 @@ exports.handler = (event, context, callback) => {
         },
     });
 
+    console.log("HTTP Method...." + event.httpMethod);
 
     switch (event.httpMethod) {
         case 'GET':
