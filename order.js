@@ -40,7 +40,7 @@ exports.handler = (event, context, callback) => {
             break;
         case 'POST':
             params.Item = event.body;
-            params.Item.ID =  uuidv1();
+            params.Item.orderid = uuidv1();
             docClient.putItem(params, done);
             break;
         default:
