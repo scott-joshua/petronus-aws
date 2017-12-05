@@ -1,29 +1,56 @@
 'use strict';
 
-exports.allocate = (event, context, callback) => {
-    let inventory = [
-        {
-            "product_id": 01003440,
-            "body_html": "<p>It's the small iPod with one very big idea: Video. Now the world's most popular music player, available in 4GB and 8GB models, lets you enjoy TV shows, movies, video podcasts, and more. The larger, brighter display means amazing picture quality. In six eye-catching colors, iPod nano is stunning all around. And with models starting at just $149, little speaks volumes.<\/p>",
-            "handle": "ipod-nano",
-            "product_type": "Nu Skin",
-            "title": "IPod Nano - 8GB",
-            "status": true,
-            "price": "199.00",
-            "formatted_price": "$199.00",
-            "grams": 567,
-            "requires_shipping": true,
-            "sku": "IPOD2008PINK",
-            "taxable": true,
-            "available": true,
-            "inventory_quantity": 1000,
-            "inventory_management": "SAP",
-            "weight": 1.25,
-            "weight_unit": "lb",
-         }
-     ];
-    callback(null, {
-        statusCode: '200',
-        body:  JSON.stringify(inventory),
+const nsinventory = require("lib/nuskin-inventory");
+
+
+exports.handler = (event, context, callback) => {
+
+    let sku = event['pathParameters']['SKU'];
+    let countryCode = event['pathParameters']['CountryCode'];
+
+    const done = (err, res) => callback(null, {
+        statusCode: err ? '400' : '200',
+        body: err ? err.message : JSON.stringify(res),
+        headers: {
+            'Content-Type': 'application/json',
+        },
     });
+
+    nsinventory.get(sku, countryCode, done);
 };
+
+
+exports.create = function (event, context, callback) {
+    let sku = event.sku;
+    let countryCode = event.countryCode;
+    nsinventory.loadSKU(sku, countryCode, done);
+
+    /*
+    USE TO CLEAR CACHE IF USING GATEWAY CACHE
+    var params = {
+        restApiId: 'atpCheck',
+        stageName: 'stage'
+    };
+    apigateway.flushStageAuthorizersCache(params, function(err, data) {
+        if (err) console.log(err, err.stack); // an error occurred
+        else     console.log(data);           // successful response
+    });
+    */
+
+};
+
+
+exports.updateSKU = function(event, context, callback) {
+    let message = event.Records[0].Sns.Message;
+    console.log('Message received from SNS:', message);
+    nsinventory.loadSKU(message.sku, message.countryCode, callback);
+};
+
+
+
+exports.allocate = function(event, context, callback) {
+    nsinventory.allocate(event, context, callback);
+};
+
+
+

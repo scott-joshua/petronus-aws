@@ -7,8 +7,18 @@ Parameters:
   ProjectId:
     Type: String
     Description: AWS Patronus Micro Services
+  InventoryNotification:
+    Type: String
+    Description: Inventory notification
 
 Resources:
+  Topic:
+      Type: AWS::SNS::Topic
+      Properties:
+        Subscription:
+        - Protocol: sqs
+          Endpoint: !Ref InventoryNotification
+
   ProductResource:
     Type: AWS::Serverless::Function
     Properties:
@@ -83,3 +93,43 @@ Resources:
               Properties:
                 Path: /cart
                 Method: put
+
+  InventoryCreateResource:
+      Type: AWS::Serverless::Function
+      Properties:
+        Handler: inventory.loadSku
+        Runtime: nodejs4.3
+        Role:
+          Fn::ImportValue:
+            !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+
+  InventoryPromiseResource:
+      Type: AWS::Serverless::Function
+      Properties:
+        Handler: inventory.allocate
+        Runtime: nodejs4.3
+        Role:
+          Fn::ImportValue:
+            !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+
+
+
+  InventoryResource:
+         Type: AWS::Serverless::Function
+
+         Properties:
+           Handler: inventory.handler
+           Runtime: nodejs4.3
+           Role:
+             Fn::ImportValue:
+               !Join ['-', [!Ref 'ProjectId', !Ref 'AWS::Region', 'LambdaTrustRole']]
+           Events:
+             GetEvent:
+               Type: Api
+               Properties:
+                 Path: /inventory/{CountryCode}/{SKU}
+                 Method: get
+                 RestApiId: atpCheck
+           Environment:
+            Variables:
+              SNS_TOPIC_ARN: !Ref Topic
